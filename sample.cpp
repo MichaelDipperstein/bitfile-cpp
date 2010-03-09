@@ -9,8 +9,11 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: sample.cpp,v 1.3 2006/02/10 04:30:47 michael Exp $
+*   $Id: sample.cpp,v 1.4 2006/06/03 18:55:10 michael Exp $
 *   $Log: sample.cpp,v $
+*   Revision 1.4  2006/06/03 18:55:10  michael
+*   Used spell checker to correct errors in comments.
+*
 *   Revision 1.3  2006/02/10 04:30:47  michael
 *   Applied fix for error discovered by Peter Husemann
 *   <peter.husemann (at) cebitec (dot) uni-bielefeld (dot) de>.
@@ -60,8 +63,8 @@ using namespace std;
 *   Function   : main
 *   Description: This function demonstrates the usage of each of the bit
 *                bit file functions.
-*   Parameters : argc - the number command line arguements (not used)
-*   Parameters : argv - array of command line arguements (not used)
+*   Parameters : argc - the number command line arguments (not used)
+*   Parameters : argv - array of command line arguments (not used)
 *   Effects    : Writes bit file, reads back results, printing them to
 *                stdout.
 *   Returned   : EXIT_SUCCESS

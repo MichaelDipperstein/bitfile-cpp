@@ -32,6 +32,7 @@ HISTORY
 12/08/05 - Added methods to get/put bits from/to integer types.
 02/09/06 - Corrected bug in GetBit discovered by Peter Husemann.  A
            0xFF byte may be recognized as an EOF.
+06/03/06 - Corrected destructor for writing bitfile objects.
 
 TODO
 ----

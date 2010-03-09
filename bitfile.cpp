@@ -7,15 +7,21 @@
 *             attempt was made to make the methods in this class analogous
 *             to the methods provided to manipulate file streams.  The
 *             methods contained in this class were created with compression
-*             algorithms in mind, but may besuited to other applications.
+*             algorithms in mind, but may be suited to other applications.
 *   Author  : Michael Dipperstein
 *   Date    : July 20, 2004
 *
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.cpp,v 1.5 2006/02/10 04:30:47 michael Exp $
+*   $Id: bitfile.cpp,v 1.6 2006/06/03 18:57:59 michael Exp $
 *   $Log: bitfile.cpp,v $
+*   Revision 1.6  2006/06/03 18:57:59  michael
+*   Corrected error discovered by anonymous in the destructor of writing
+*   objects.  Underlying output stream was not being deleted.
+*
+*   Used spell checker to correct comments.
+*
 *   Revision 1.5  2006/02/10 04:30:47  michael
 *   Applied fix for error discovered by Peter Husemann
 *   <peter.husemann (at) cebitec (dot) uni-bielefeld (dot) de>.
@@ -119,7 +125,7 @@ bit_file_c::bit_file_c(void)
 /***************************************************************************
 *   Method     : bit_file_c - constructor
 *   Description: This is a bit_file_c constructor.  It opens an input or
-*                output steram and clears the bit buffer.  An exception
+*                output stream and clears the bit buffer.  An exception
 *                will be thrown on error.
 *   Parameters : fileName - NULL terminated string containing the name of
 *                           the file to be opened.
@@ -241,13 +247,13 @@ bit_file_c::~bit_file_c(void)
         }
 
         m_OutStream->close();
-        delete m_InStream;
+        delete m_OutStream;
     }
 }
 
 /***************************************************************************
 *   Method     : Open
-*   Description: This method opens an input or output steram and initializes
+*   Description: This method opens an input or output stream and initializes
 *                the bit buffer.  An exception will be thrown on error.
 *   Parameters : fileName - NULL terminated string containing the name of
 *                           the file to be opened.
@@ -664,10 +670,10 @@ int bit_file_c::PutBits(void *bits, const unsigned int count)
 
 /***************************************************************************
 *   Method:    : GetBitsInt
-*   Description: This method provides a machine independant layer that
+*   Description: This method provides a machine independent layer that
 *                allows a single call to stuff an arbitrary number of bits
-*                of bits read from the file stream into an integer type
-*                variable (short, int, long, ...).
+*                read from the file stream into an integer type variable
+*                (short, int, long, ...).
 *   Parameters : bits - address to store bits read
 *                count - number of bits to read
 *                size - sizeof type containing "bits"
@@ -717,7 +723,7 @@ int bit_file_c::GetBitsInt(void *bits, const unsigned int count,
 *                a little endian integer of length >= (count/8) + 1.
 *   Returned   : EOF for failure, otherwise the number of bits read.  If
 *                an EOF is reached before all the bits are read, bits
-*                will contain every bit through the last sucessful read.
+*                will contain every bit through the last successful read.
 ***************************************************************************/
 int bit_file_c::GetBitsLE(void *bits, const unsigned int count)
 {
@@ -785,7 +791,7 @@ int bit_file_c::GetBitsLE(void *bits, const unsigned int count)
 *                a big endian integer of length size.
 *   Returned   : EOF for failure, otherwise the number of bits read.  If
 *                an EOF is reached before all the bits are read, bits
-*                will contain every bit through the last sucessful read.
+*                will contain every bit through the last successful read.
 ***************************************************************************/
 int bit_file_c::GetBitsBE(void *bits, const unsigned int count,
     const size_t size)
@@ -844,7 +850,7 @@ int bit_file_c::GetBitsBE(void *bits, const unsigned int count,
 
 /***************************************************************************
 *   Method     : PutBitsInt
-*   Description: This method provides a machine independant layer that
+*   Description: This method provides a machine independent layer that
 *                allows a single function call to write an arbitrary number
 *                of bits from an integer type variable (short, int, long,
 *                ...) to the file stream.
@@ -1015,7 +1021,7 @@ int bit_file_c::PutBitsBE(void *bits, const unsigned int count,
 
 /***************************************************************************
 *   Method     : eof
-*   Description: This method indictaes whether or not the open file stream
+*   Description: This method indicates whether or not the open file stream
 *                is at the end of file.
 *   Parameters : None
 *   Effects    : None
@@ -1085,4 +1091,3 @@ bool bit_file_c::bad(void)
     /* return false for no file */
     return false;
 }
-
