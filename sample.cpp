@@ -9,8 +9,11 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: sample.cpp,v 1.5 2007/08/26 21:42:01 michael Exp $
+*   $Id: sample.cpp,v 1.6 2009/01/04 06:36:50 michael Exp $
 *   $Log: sample.cpp,v $
+*   Revision 1.6  2009/01/04 06:36:50  michael
+*   Correct Included files.
+*
 *   Revision 1.5  2007/08/26 21:42:01  michael
 *   LGPL v3 License
 *
@@ -50,6 +53,7 @@
 *
 ***************************************************************************/
 #include <iostream>
+#include <stdlib.h>
 #include "bitfile.h"
 
 using namespace std;

@@ -37,7 +37,9 @@ HISTORY
 08/26/07 - All methods that don't modify the calling object have been made
            const to increase functionality of const bit_array_c.
            Updated license to LGPL v3.
-01/26/07 - Added ByteAlign and FlushOutput methods.OB
+01/26/07 - Added ByteAlign and FlushOutput methods.
+07/22/09 - Zeros out MS bits in int returned by GetChar when not returning
+           an EOF.
 
 TODO
 ----

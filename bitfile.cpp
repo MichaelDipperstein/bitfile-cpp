@@ -14,8 +14,14 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.cpp,v 1.9 2008/01/27 06:04:54 michael Exp $
+*   $Id: bitfile.cpp,v 1.11 2009/07/23 03:57:56 michael Exp $
 *   $Log: bitfile.cpp,v $
+*   Revision 1.11  2009/07/23 03:57:56  michael
+*   Zero out MSBs in value returned by GetBits when not retuning EOF.
+*
+*   Revision 1.10  2008/09/15 04:12:53  michael
+*   Removed dead code.
+*
 *   Revision 1.9  2008/01/27 06:04:54  michael
 *   Added  ByteAlign() and FlushOutput() methods.
 *
@@ -521,7 +527,7 @@ int bit_file_c::GetChar(void)
     /* put remaining in buffer. count shouldn't change. */
     m_BitBuffer = (char)returnValue;
 
-    returnValue = tmp;
+    returnValue = tmp & 0xFF;
 
     return returnValue;
 }
@@ -831,7 +837,7 @@ int bit_file_c::GetBitsInt(void *bits, const unsigned int count,
 ***************************************************************************/
 int bit_file_c::GetBitsLE(void *bits, const unsigned int count)
 {
-    char *bytes, shifts;
+    char *bytes;
     int offset, remaining, returnValue;
 
     if ((m_InStream == NULL) || (bits == NULL))
@@ -862,8 +868,6 @@ int bit_file_c::GetBitsLE(void *bits, const unsigned int count)
     if (remaining != 0)
     {
         /* read remaining bits */
-        shifts = 8 - remaining;
-
         while (remaining > 0)
         {
             returnValue = this->GetBit();
@@ -900,7 +904,7 @@ int bit_file_c::GetBitsLE(void *bits, const unsigned int count)
 int bit_file_c::GetBitsBE(void *bits, const unsigned int count,
     const size_t size)
 {
-    unsigned char *bytes, shifts;
+    unsigned char *bytes;
     int offset, remaining, returnValue;
 
     if (count > (size * 8))
@@ -932,8 +936,6 @@ int bit_file_c::GetBitsBE(void *bits, const unsigned int count,
     if (remaining != 0)
     {
         /* read remaining bits */
-        shifts = 8 - remaining;
-
         while (remaining > 0)
         {
             returnValue = this->GetBit();
