@@ -9,8 +9,13 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: sample.cpp,v 1.2 2005/12/10 05:20:01 michael Exp $
+*   $Id: sample.cpp,v 1.3 2006/02/10 04:30:47 michael Exp $
 *   $Log: sample.cpp,v $
+*   Revision 1.3  2006/02/10 04:30:47  michael
+*   Applied fix for error discovered by Peter Husemann
+*   <peter.husemann (at) cebitec (dot) uni-bielefeld (dot) de>.
+*   When GetBit() reads a 0xFF byte, it would mistake it for EOF.
+*
 *   Revision 1.2  2005/12/10 05:20:01  michael
 *   Added methods to get/put bits from/to integer types.
 *
@@ -103,7 +108,7 @@ int main(int argc, char *argv[])
     }
 
     /* write single bits */
-    value = 0;
+    value = 1;
     for (i = 0; i < NUM_CALLS; i++)
     {
         cout << "writing bit " << value << endl;

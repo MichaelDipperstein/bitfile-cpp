@@ -14,8 +14,13 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.cpp,v 1.4 2005/12/10 05:20:01 michael Exp $
+*   $Id: bitfile.cpp,v 1.5 2006/02/10 04:30:47 michael Exp $
 *   $Log: bitfile.cpp,v $
+*   Revision 1.5  2006/02/10 04:30:47  michael
+*   Applied fix for error discovered by Peter Husemann
+*   <peter.husemann (at) cebitec (dot) uni-bielefeld (dot) de>.
+*   When GetBit() reads a 0xFF byte, it would mistake it for EOF.
+*
 *   Revision 1.4  2005/12/10 05:20:01  michael
 *   Added methods to get/put bits from/to integer types.
 *
@@ -383,7 +388,12 @@ int bit_file_c::GetChar(void)
 
     if (m_InStream == NULL)
     {
-        return(EOF);
+        return EOF;
+    }
+
+    if (m_InStream->eof())
+    {
+        return EOF;
     }
 
     returnValue = m_InStream->get();
@@ -394,17 +404,14 @@ int bit_file_c::GetChar(void)
         return returnValue;
     }
 
-    if (returnValue != EOF)
-    {
-        /* we have some buffered bits to return too */
-        tmp = (returnValue >> m_BitCount);
-        tmp |= m_BitBuffer << (8 - m_BitCount);
+    /* we have some buffered bits to return too */
+    tmp = (returnValue >> m_BitCount);
+    tmp |= m_BitBuffer << (8 - m_BitCount);
 
-        /* put remaining in buffer. count shouldn't change. */
-        m_BitBuffer = (char)returnValue;
+    /* put remaining in buffer. count shouldn't change. */
+    m_BitBuffer = (char)returnValue;
 
-        returnValue = tmp;
-    }
+    returnValue = tmp;
 
     return returnValue;
 }
@@ -456,7 +463,7 @@ int bit_file_c::PutChar(const int c)
 ***************************************************************************/
 int bit_file_c::GetBit(void)
 {
-    char returnValue;
+    int returnValue;
 
     if (m_InStream == NULL)
     {
@@ -468,7 +475,7 @@ int bit_file_c::GetBit(void)
         /* buffer is empty, read another character */
         if ((returnValue = m_InStream->get()) == EOF)
         {
-            return EOF;
+            return EOF;         /* nothing left to read */
         }
         else
         {
