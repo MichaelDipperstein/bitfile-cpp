@@ -14,10 +14,14 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.cpp,v 1.8 2007/08/26 21:41:36 michael Exp $
+*   $Id: bitfile.cpp,v 1.9 2008/01/27 06:04:54 michael Exp $
 *   $Log: bitfile.cpp,v $
+*   Revision 1.9  2008/01/27 06:04:54  michael
+*   Added  ByteAlign() and FlushOutput() methods.
+*
 *   Revision 1.8  2007/08/26 21:41:36  michael
-*   All methods that don't modify the calling object have been made const to increase functionality of const bit_array_c.
+*   All methods that don't modify the calling object have been made const to
+*   increase functionality of const bit_array_c.
 *
 *   Changes required for LGPL v3.
 *
@@ -387,6 +391,97 @@ void bit_file_c::Close(void)
         m_BitCount = 0;
         m_Mode = BF_NO_MODE;
     }
+}
+
+/***************************************************************************
+*   Method     : ByteAlign
+*   Description: This method aligns the bitfile to the nearest byte.  For
+*                output files, this means writing out the bit buffer with
+*                extra bits set to 0.  For input files, this means flushing
+*                the bit buffer.
+*   Parameters : None
+*   Effects    : Flushes out the bit buffer.
+*   Returned   : EOF if stream is NULL or write fails.  Writes return the
+*                byte aligned contents of the bit buffer.  Reads returns
+*                the unaligned contents of the bit buffer.
+***************************************************************************/
+int bit_file_c::ByteAlign(void)
+{
+    int returnValue;
+
+    if ((BF_WRITE == m_Mode) || (BF_APPEND == m_Mode))
+    {
+        if (NULL == m_OutStream)
+        {
+            return(EOF);
+        }
+    }
+    else
+    {
+        if (NULL == m_InStream)
+        {
+            return(EOF);
+        }
+    }
+
+    returnValue = m_BitBuffer;
+
+    if ((BF_WRITE == m_Mode) || (BF_APPEND == m_Mode))
+    {
+        /* write out any unwritten bits */
+        if (m_BitCount != 0)
+        {
+            m_BitBuffer <<= 8 - (m_BitCount);
+            m_OutStream->put(m_BitBuffer);  /* check for error */
+        }
+    }
+
+    m_BitBuffer = 0;
+    m_BitCount = 0;
+
+    return (returnValue);
+}
+
+/***************************************************************************
+*   Method     : FlushOutput
+*   Description: This method flushes the output bit buffer.  This means
+*                left justifying any pending bits, and filling spare bits
+*                with the fill value.
+*   Parameters : onesFill - non-zero if spare bits are filled with ones
+*   Effects    : Flushes out the bit buffer, filling spare bits with ones
+*                or zeros.
+*   Returned   : EOF if stream is NULL or not writeable.  Otherwise, the
+*                bit buffer value written. -1 if no data was written.
+***************************************************************************/
+int bit_file_c::FlushOutput(const unsigned char onesFill)
+{
+    int returnValue;
+
+    if (NULL == m_OutStream)
+    {
+        return(EOF);
+    }
+
+    returnValue = -1;
+
+    /* write out any unwritten bits */
+    if (m_BitCount != 0)
+    {
+        m_BitBuffer <<= (8 - m_BitCount);
+
+        if (onesFill)
+        {
+            m_BitBuffer |= (0xFF >> m_BitCount);
+        }
+
+        m_OutStream->put(m_BitBuffer);      /* check for error */
+        returnValue = m_BitBuffer;
+    }
+
+    m_BitBuffer = 0;
+    m_BitCount = 0;
+
+    return (returnValue);
 }
 
 /***************************************************************************

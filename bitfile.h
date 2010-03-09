@@ -15,10 +15,14 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.h,v 1.5 2007/08/26 21:41:36 michael Exp $
+*   $Id: bitfile.h,v 1.6 2008/01/27 06:04:54 michael Exp $
 *   $Log: bitfile.h,v $
+*   Revision 1.6  2008/01/27 06:04:54  michael
+*   Added  ByteAlign() and FlushOutput() methods.
+*
 *   Revision 1.5  2007/08/26 21:41:36  michael
-*   All methods that don't modify the calling object have been made const to increase functionality of const bit_array_c.
+*   All methods that don't modify the calling object have been made const
+*   to increase functionality of const bit_array_c.
 *
 *   Changes required for LGPL v3.
 *
@@ -91,6 +95,12 @@ class bit_file_c
         /* open/close bit file */
         void Open(const char *fileName, const BF_MODES mode);
         void Close(void);
+
+        /* toss spare bits and byte align file */
+        int ByteAlign(void);
+
+        /* fill byte with ones or zeros and write out results */
+        int FlushOutput(const unsigned char onesFill);
 
         /* get/put character */
         int GetChar(void);

@@ -1,4 +1,4 @@
-DESCRIPTION
+DESCRIPTION:
 -----------
 This archive contains an ISO C++ class implementing bitwise reading and
 writing for sequential files.  This class is intended to be easy to follow
@@ -37,6 +37,7 @@ HISTORY
 08/26/07 - All methods that don't modify the calling object have been made
            const to increase functionality of const bit_array_c.
            Updated license to LGPL v3.
+01/26/07 - Added ByteAlign and FlushOutput methods.OB
 
 TODO
 ----
