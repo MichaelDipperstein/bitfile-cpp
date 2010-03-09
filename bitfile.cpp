@@ -14,8 +14,11 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.cpp,v 1.3 2005/06/23 04:39:06 michael Exp $
+*   $Id: bitfile.cpp,v 1.4 2005/12/10 05:20:01 michael Exp $
 *   $Log: bitfile.cpp,v $
+*   Revision 1.4  2005/12/10 05:20:01  michael
+*   Added methods to get/put bits from/to integer types.
+*
 *   Revision 1.3  2005/06/23 04:39:06  michael
 *   Convert from DOS end of line to Unix end of line
 *
@@ -30,7 +33,7 @@
 ****************************************************************************
 *
 * Bitfile: Bit Stream File I/O Class
-* Copyright (C) 2004 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004-2005 by Michael Dipperstein (mdipper@cs.ucsb.edu)
 *
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -56,6 +59,17 @@
 using namespace std;
 
 /***************************************************************************
+*                            TYPE DEFINITIONS
+***************************************************************************/
+
+/* union used to test for endianess */
+typedef union
+{
+    unsigned long word;
+    unsigned char bytes[sizeof(unsigned long)];
+} endian_test_t;
+
+/***************************************************************************
 *                                 METHODS
 ***************************************************************************/
 
@@ -75,6 +89,26 @@ bit_file_c::bit_file_c(void)
     m_BitBuffer = 0;
     m_BitCount = 0;
     m_Mode = BF_NO_MODE;
+
+    /* test for endianess */
+    endian_test_t endianTest;
+
+    endianTest.word = 1;
+    
+    if (endianTest.bytes[0] == 1)
+    {
+        /* LSB is 1st byte (little endian)*/
+        m_endian = BF_LITTLE_ENDIAN;
+    }
+    else if (endianTest.bytes[sizeof(unsigned long) - 1] == 1)
+    {
+        /* LSB is last byte (big endian)*/
+        m_endian = BF_BIG_ENDIAN;
+    }
+    else
+    {
+        m_endian = BF_UNKNOWN_ENDIAN;
+    }
 }
 
 /***************************************************************************
@@ -152,6 +186,26 @@ bit_file_c::bit_file_c(const char *fileName, const BF_MODES mode)
     if ((m_InStream == NULL) && (m_OutStream == NULL))
     {
         throw("Error: Unable To Open File");
+    }
+
+    /* test for endianess */
+    endian_test_t endianTest;
+
+    endianTest.word = 1;
+    
+    if (endianTest.bytes[0] == 1)
+    {
+        /* LSB is 1st byte (little endian)*/
+        m_endian = BF_LITTLE_ENDIAN;
+    }
+    else if (endianTest.bytes[sizeof(unsigned long) - 1] == 1)
+    {
+        /* LSB is last byte (big endian)*/
+        m_endian = BF_BIG_ENDIAN;
+    }
+    else
+    {
+        m_endian = BF_UNKNOWN_ENDIAN;
     }
 }
 
@@ -584,6 +638,357 @@ int bit_file_c::PutBits(void *bits, const unsigned int count)
     {
         /* write remaining bits */
         tmp = bytes[offset];
+        while (remaining > 0)
+        {
+            returnValue = this->PutBit(tmp & 0x80);
+
+            if (returnValue == EOF)
+            {
+                return EOF;
+            }
+
+            tmp <<= 1;
+            remaining--;
+        }
+    }
+
+    return count;
+}
+
+/***************************************************************************
+*   Method:    : GetBitsInt
+*   Description: This method provides a machine independant layer that
+*                allows a single call to stuff an arbitrary number of bits
+*                of bits read from the file stream into an integer type
+*                variable (short, int, long, ...).
+*   Parameters : bits - address to store bits read
+*                count - number of bits to read
+*                size - sizeof type containing "bits"
+*   Effects    : Calls a method that reads bits from the bit buffer and
+*                file stream.  The bit buffer will be modified as necessary.
+*                the bits will be written to "bits" from least significant
+*                byte to most significant byte.
+*   Returned   : EOF for failure, otherwise the number of bits read by the
+*                called method.  An error is thrown if the machine
+*                endianess is unknown.
+***************************************************************************/
+int bit_file_c::GetBitsInt(void *bits, const unsigned int count,
+    const size_t size)
+{
+    int returnValue;
+
+    if ((m_InStream == NULL) || (bits == NULL))
+    {
+        return EOF;
+    }
+
+    if (m_endian == BF_LITTLE_ENDIAN)
+    {
+        returnValue = this->GetBitsLE(bits, count);
+    }
+    else if (m_endian == BF_BIG_ENDIAN)
+    {
+        returnValue = this->GetBitsBE(bits, count, size);
+    }
+    else
+    {
+        throw("Error: System Endianess Unknown");
+    }
+
+    return returnValue;
+}
+
+/***************************************************************************
+*   Method     : GetBitsLE   (Little Endian)
+*   Description: This method reads the specified number of bits from the
+*                bit file and writes them to the requested memory location.
+*                Bits are read LSB to MSB.
+*   Parameters : bits - address to store bits read
+*                count - number of bits to read
+*   Effects    : Reads bits from the bit buffer and file stream.  The bit
+*                buffer will be modified as necessary.  bits is treated as
+*                a little endian integer of length >= (count/8) + 1.
+*   Returned   : EOF for failure, otherwise the number of bits read.  If
+*                an EOF is reached before all the bits are read, bits
+*                will contain every bit through the last sucessful read.
+***************************************************************************/
+int bit_file_c::GetBitsLE(void *bits, const unsigned int count)
+{
+    char *bytes, shifts;
+    int offset, remaining, returnValue;
+
+    if ((m_InStream == NULL) || (bits == NULL))
+    {
+        return EOF;
+    }
+
+    bytes = (char *)bits;
+
+    offset = 0;
+    remaining = count;
+
+    /* read whole bytes */
+    while (remaining >= 8)
+    {
+        returnValue = this->GetChar();
+
+        if (returnValue == EOF)
+        {
+            return EOF;
+        }
+
+        bytes[offset] = (char)returnValue;
+        remaining -= 8;
+        offset++;
+    }
+
+    if (remaining != 0)
+    {
+        /* read remaining bits */
+        shifts = 8 - remaining;
+
+        while (remaining > 0)
+        {
+            returnValue = this->GetBit();
+
+            if (returnValue == EOF)
+            {
+                return EOF;
+            }
+
+            bytes[offset] <<= 1;
+            bytes[offset] |= (returnValue & 0x01);
+            remaining--;
+        }
+    }
+
+    return count;
+}
+
+/***************************************************************************
+*   Method     : GetBitsBE   (Big Endian)
+*   Description: This method reads the specified number of bits from the
+*                bit file and writes them to the requested memory location.
+*                Bits are read LSB to MSB.
+*   Parameters : bits - address to store bits read
+*                count - number of bits to read
+*                size - sizeof type containing "bits"
+*   Effects    : Reads bits from the bit buffer and file stream.  The bit
+*                buffer will be modified as necessary.  bits is treated as
+*                a big endian integer of length size.
+*   Returned   : EOF for failure, otherwise the number of bits read.  If
+*                an EOF is reached before all the bits are read, bits
+*                will contain every bit through the last sucessful read.
+***************************************************************************/
+int bit_file_c::GetBitsBE(void *bits, const unsigned int count,
+    const size_t size)
+{
+    unsigned char *bytes, shifts;
+    int offset, remaining, returnValue;
+
+    if (count > (size * 8))
+    {
+        /* too many bits to read */
+        return EOF;
+    }
+
+    bytes = (unsigned char *)bits;
+
+    offset = size - 1;
+    remaining = count;
+
+    /* read whole bytes */
+    while (remaining >= 8)
+    {
+        returnValue = this->GetChar();
+
+        if (returnValue == EOF)
+        {
+            return EOF;
+        }
+
+        bytes[offset] = (unsigned char)returnValue;
+        remaining -= 8;
+        offset--;
+    }
+
+    if (remaining != 0)
+    {
+        /* read remaining bits */
+        shifts = 8 - remaining;
+
+        while (remaining > 0)
+        {
+            returnValue = this->GetBit();
+
+            if (returnValue == EOF)
+            {
+                return EOF;
+            }
+
+            bytes[offset] <<= 1;
+            bytes[offset] |= (returnValue & 0x01);
+            remaining--;
+        }
+    }
+
+    return count;
+}
+
+/***************************************************************************
+*   Method     : PutBitsInt
+*   Description: This method provides a machine independant layer that
+*                allows a single function call to write an arbitrary number
+*                of bits from an integer type variable (short, int, long,
+*                ...) to the file stream.
+*   Parameters : bits - pointer to bits to write
+*                count - number of bits to write
+*                size - sizeof type containing "bits"
+*   Effects    : Calls a method that writes bits to the bit buffer and
+*                file stream.  The bit buffer will be modified as necessary.
+*                the bits will be written to the file stream from least
+*                significant byte to most significant byte.
+*   Returned   : EOF for failure, otherwise the number of bits written.  If
+*                an error occurs after a partial write, the partially
+*                written bits will not be unwritten.  An error is thrown if
+*                the machine endianess is unknown.
+***************************************************************************/
+int bit_file_c::PutBitsInt(void *bits, const unsigned int count,
+    const size_t size)
+{
+    int returnValue;
+
+    if ((m_OutStream == NULL) || (bits == NULL))
+    {
+        return EOF;
+    }
+
+    if (m_endian == BF_LITTLE_ENDIAN)
+    {
+        returnValue = this->PutBitsLE(bits, count);
+    }
+    else if (m_endian == BF_BIG_ENDIAN)
+    {
+        returnValue = this->PutBitsBE(bits, count, size);
+    }
+    else
+    {
+        throw("Error: System Endianess Unknown");
+    }
+
+    return returnValue;
+}
+
+/***************************************************************************
+*   Method     : PutBitsLE   (Little Endian)
+*   Description: This method writes the specified number of bits from the
+*                memory location passed as a parameter to the file stream
+*                Bits are written LSB to MSB, assuming little endian order.
+*   Parameters : bits - pointer to bits to write
+*                count - number of bits to write
+*   Effects    : Writes bits to the bit buffer and file stream.  The bit
+*                buffer will be modified as necessary.  bits is treated as
+*                a little endian integer of length >= (count/8) + 1.
+*   Returned   : EOF for failure, otherwise the number of bits written.  If
+*                an error occurs after a partial write, the partially
+*                written bits will not be unwritten.
+***************************************************************************/
+int bit_file_c::PutBitsLE(void *bits, const unsigned int count)
+{
+    unsigned char *bytes, tmp;
+    int offset, remaining, returnValue;
+
+    bytes = (unsigned char *)bits;
+    offset = 0;
+    remaining = count;
+
+    /* write whole bytes */
+    while (remaining >= 8)
+    {
+        returnValue = this->PutChar(bytes[offset]);
+
+        if (returnValue == EOF)
+        {
+            return EOF;
+        }
+
+        remaining -= 8;
+        offset++;
+    }
+
+    if (remaining != 0)
+    {
+        /* write remaining bits */
+        tmp = bytes[offset];
+        tmp <<= (8 - remaining);
+
+        while (remaining > 0)
+        {
+            returnValue = this->PutBit(tmp & 0x80);
+
+            if (returnValue == EOF)
+            {
+                return EOF;
+            }
+
+            tmp <<= 1;
+            remaining--;
+        }
+    }
+
+    return count;
+}
+
+/***************************************************************************
+*   Method     : PutBitsBE   (Big Endian)
+*   Description: This method writes the specified number of bits from the
+*                memory location passed as a parameter to the file stream
+*                Bits are written LSB to MSB, assuming big endian order.
+*   Parameters : bits - pointer to bits to write
+*                count - number of bits to write
+*   Effects    : Writes bits to the bit buffer and file stream.  The bit
+*                buffer will be modified as necessary.  bits is treated as
+*                a big endian integer of length size.
+*   Returned   : EOF for failure, otherwise the number of bits written.  If
+*                an error occurs after a partial write, the partially
+*                written bits will not be unwritten.
+***************************************************************************/
+int bit_file_c::PutBitsBE(void *bits, const unsigned int count,
+    const size_t size)
+{
+    unsigned char *bytes, tmp;
+    int offset, remaining, returnValue;
+
+    if (count > (size * 8))
+    {
+        /* too many bits to write */
+        return EOF;
+    }
+
+    bytes = (unsigned char *)bits;
+    offset = size - 1;
+    remaining = count;
+
+    /* write whole bytes */
+    while (remaining >= 8)
+    {
+        returnValue = this->PutChar(bytes[offset]);
+
+        if (returnValue == EOF)
+        {
+            return EOF;
+        }
+
+        remaining -= 8;
+        offset--;
+    }
+
+    if (remaining != 0)
+    {
+        /* write remaining bits */
+        tmp = bytes[offset];
+        tmp <<= (8 - remaining);
+
         while (remaining > 0)
         {
             returnValue = this->PutBit(tmp & 0x80);

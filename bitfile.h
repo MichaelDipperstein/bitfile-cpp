@@ -15,8 +15,11 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.h,v 1.2 2005/06/23 04:39:06 michael Exp $
+*   $Id: bitfile.h,v 1.3 2005/12/10 05:20:01 michael Exp $
 *   $Log: bitfile.h,v $
+*   Revision 1.3  2005/12/10 05:20:01  michael
+*   Added methods to get/put bits from/to integer types.
+*
 *   Revision 1.2  2005/06/23 04:39:06  michael
 *   Convert from DOS end of line to Unix end of line
 *
@@ -27,7 +30,7 @@
 ****************************************************************************
 *
 * Bitfile: Bit Stream File I/O Class
-* Copyright (C) 2004 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004-2005 by Michael Dipperstein (mdipper@cs.ucsb.edu)
 *
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
@@ -62,6 +65,13 @@ typedef enum
     BF_NO_MODE
 } BF_MODES;
 
+typedef enum
+{
+    BF_UNKNOWN_ENDIAN,
+    BF_LITTLE_ENDIAN,
+    BF_BIG_ENDIAN,
+} endian_t;
+
 class bit_file_c
 {
     public:
@@ -85,6 +95,13 @@ class bit_file_c
         int GetBits(void *bits, const unsigned int count);
         int PutBits(void *bits, const unsigned int count);
 
+        /* get/put number of bits to/from integer types (short, int, ...)*/
+        /* size is size of data structure pointed to by bits.            */
+        int GetBitsInt(void *bits, const unsigned int count,
+            const size_t size);
+        int PutBitsInt(void *bits, const unsigned int count,
+            const size_t size);
+
         /* status */
         bool eof(void);
         bool good(void);
@@ -93,9 +110,19 @@ class bit_file_c
     private:
         std::ifstream *m_InStream;      /* input file stream pointer */
         std::ofstream *m_OutStream;     /* output file stream pointer */
+        endian_t m_endian;              /* endianess of architecture */
         char m_BitBuffer;               /* bits waiting to be read/written */
         unsigned char m_BitCount;       /* number of bits in bitBuffer */
         BF_MODES m_Mode;                /* open for read, write, or append */
+
+        /* endianess aware methods used by GetBitsInt/PutBitsInt */
+        int GetBitsLE(void *bits, const unsigned int count);
+        int PutBitsLE(void *bits, const unsigned int count);
+
+        int GetBitsBE(void *bits, const unsigned int count,
+            const size_t size);
+        int PutBitsBE(void *bits, const unsigned int count,
+            const size_t size);
 };
 
 #endif  /* ndef __BITFILE_H */

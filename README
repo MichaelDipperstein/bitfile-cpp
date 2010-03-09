@@ -29,6 +29,7 @@ HISTORY
 08/04/04 - Initial release
 06/21/05 - Corrected GetBits/PutBits error that accessed an extra byte
            when given an integral number of bytes.
+12/08/05 - Added methods to get/put bits from/to integer types.
 
 TODO
 ----

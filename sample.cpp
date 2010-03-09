@@ -9,8 +9,11 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: sample.cpp,v 1.1.1.1 2004/08/04 13:45:38 michael Exp $
+*   $Id: sample.cpp,v 1.2 2005/12/10 05:20:01 michael Exp $
 *   $Log: sample.cpp,v $
+*   Revision 1.2  2005/12/10 05:20:01  michael
+*   Added methods to get/put bits from/to integer types.
+*
 *   Revision 1.1.1.1  2004/08/04 13:45:38  michael
 *   bitfile class
 *
@@ -130,6 +133,21 @@ int main(int argc, char *argv[])
         value += 0x11111111;
     }
 
+    /* write some bits from an integer */
+    value = 0x111;
+    for (i = 0; i < NUM_CALLS; i++)
+    {
+        cout << "writing 12 bits from an integer " << value << endl;
+        if(bf.PutBitsInt(&value, 12, sizeof(value)) == EOF)
+        {
+            cerr << "Error: writing bits from an integer" << endl;
+            bf.Close();
+            return (EXIT_FAILURE);
+        }
+
+        value += 0x111;
+    }
+
     bf.Close();
 
     /* now read back writes */
@@ -194,6 +212,22 @@ int main(int argc, char *argv[])
         else
         {
             cout << "read bits " << value << endl;
+        }
+    }
+
+    /* read some bits into an integer */
+    for (i = 0; i < NUM_CALLS; i++)
+    {
+        value = 0;
+        if(bf.GetBitsInt(&value, 12, sizeof(value)) == EOF)
+        {
+            cerr << "Error: reading bits from an integer" << endl;
+            bf.Close();
+            return (EXIT_FAILURE);
+        }
+        else
+        {
+            cout << "read 12 bits into an integer " << value << endl;
         }
     }
 
