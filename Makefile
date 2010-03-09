@@ -1,8 +1,11 @@
 ############################################################################
 # Makefile for file class library and sample
 #
-#   $Id: Makefile,v 1.1.1.1 2004/08/04 13:45:38 michael Exp $
+#   $Id: Makefile,v 1.2 2005/06/23 04:39:06 michael Exp $
 #   $Log: Makefile,v $
+#   Revision 1.2  2005/06/23 04:39:06  michael
+#   Convert from DOS end of line to Unix end of line
+#
 #   Revision 1.1.1.1  2004/08/04 13:45:38  michael
 #   bitfile class
 #
@@ -40,3 +43,4 @@ bitfile.o:	bitfile.cpp bitfile.h
 clean:
 		$(DEL) *.o
 		$(DEL) sample$(EXE)
+		$(DEL) testfile

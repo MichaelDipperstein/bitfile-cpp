@@ -22,11 +22,13 @@ command line.
 
 USAGE
 -----
-sample.c demonstrates usage of each of the bitfile functions.
+sample.cpp demonstrates usage of each of the bitfile methods.
 
 HISTORY
 -------
 08/04/04 - Initial release
+06/21/05 - Corrected GetBits/PutBits error that accessed an extra byte
+           when given an integral number of bytes.
 
 TODO
 ----

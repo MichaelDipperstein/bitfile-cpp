@@ -14,8 +14,15 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.cpp,v 1.1.1.1 2004/08/04 13:45:38 michael Exp $
+*   $Id: bitfile.cpp,v 1.3 2005/06/23 04:39:06 michael Exp $
 *   $Log: bitfile.cpp,v $
+*   Revision 1.3  2005/06/23 04:39:06  michael
+*   Convert from DOS end of line to Unix end of line
+*
+*   Revision 1.2  2005/06/23 04:33:07  michael
+*   Prevent GetBits/PutBits from accessing an extra byte when given an
+*   integral number of bytes.
+*
 *   Revision 1.1.1.1  2004/08/04 13:45:38  michael
 *   bitfile class
 *
@@ -505,24 +512,28 @@ int bit_file_c::GetBits(void *bits, const unsigned int count)
         offset++;
     }
 
-    /* read remaining bits */
-    shifts = 8 - remaining;
-    while (remaining > 0)
+    if (remaining != 0)
     {
-        returnValue = this->GetBit();
+        /* read remaining bits */
+        shifts = 8 - remaining;
 
-        if (returnValue == EOF)
+        while (remaining > 0)
         {
-            return EOF;
+            returnValue = this->GetBit();
+
+            if (returnValue == EOF)
+            {
+                return EOF;
+            }
+
+            bytes[offset] <<= 1;
+            bytes[offset] |= (returnValue & 0x01);
+            remaining--;
         }
 
-        bytes[offset] <<= 1;
-        bytes[offset] |= (returnValue & 0x01);
-        remaining--;
+        /* shift last bits into position */
+        bytes[offset] <<= shifts;
     }
-
-    /* shift last bits into position */
-    bytes[offset] <<= shifts;
 
     return count;
 }
@@ -569,19 +580,22 @@ int bit_file_c::PutBits(void *bits, const unsigned int count)
         offset++;
     }
 
-    /* write remaining bits */
-    tmp = bytes[offset];
-    while (remaining > 0)
+    if (remaining != 0)
     {
-        returnValue = this->PutBit(tmp & 0x80);
-
-        if (returnValue == EOF)
+        /* write remaining bits */
+        tmp = bytes[offset];
+        while (remaining > 0)
         {
-            return EOF;
-        }
+            returnValue = this->PutBit(tmp & 0x80);
 
-        tmp <<= 1;
-        remaining--;
+            if (returnValue == EOF)
+            {
+                return EOF;
+            }
+
+            tmp <<= 1;
+            remaining--;
+        }
     }
 
     return count;
