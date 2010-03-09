@@ -14,8 +14,16 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.cpp,v 1.6 2006/06/03 18:57:59 michael Exp $
+*   $Id: bitfile.cpp,v 1.8 2007/08/26 21:41:36 michael Exp $
 *   $Log: bitfile.cpp,v $
+*   Revision 1.8  2007/08/26 21:41:36  michael
+*   All methods that don't modify the calling object have been made const to increase functionality of const bit_array_c.
+*
+*   Changes required for LGPL v3.
+*
+*   Revision 1.7  2007/02/06 06:25:02  michael
+*   Trim trailing spaces.
+*
 *   Revision 1.6  2006/06/03 18:57:59  michael
 *   Corrected error discovered by anonymous in the destructor of writing
 *   objects.  Underlying output stream was not being deleted.
@@ -44,21 +52,22 @@
 ****************************************************************************
 *
 * Bitfile: Bit Stream File I/O Class
-* Copyright (C) 2004-2005 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
 *
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
+* This file is part of the bit file library.
 *
-* This library is distributed in the hope that it will be useful,
+* The bit file library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 3 of the
+* License, or (at your option) any later version.
+*
+* The bit file library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+* General Public License for more details.
 *
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+* You should have received a copy of the GNU Lesser General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
 
@@ -105,7 +114,7 @@ bit_file_c::bit_file_c(void)
     endian_test_t endianTest;
 
     endianTest.word = 1;
-    
+
     if (endianTest.bytes[0] == 1)
     {
         /* LSB is 1st byte (little endian)*/
@@ -203,7 +212,7 @@ bit_file_c::bit_file_c(const char *fileName, const BF_MODES mode)
     endian_test_t endianTest;
 
     endianTest.word = 1;
-    
+
     if (endianTest.bytes[0] == 1)
     {
         /* LSB is 1st byte (little endian)*/

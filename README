@@ -10,10 +10,11 @@ FILES
 bitfile.cpp     - Class implementing bitwise reading and writing for
                   sequential files.
 bitfile.h       - Header for bitfile class.
-sample.cpp      - Program demonstrating how to use the bitfile class. 
-LICENSE         - GNU Lesser General Public License
+COPYING         - GNU General Public License v3
+COPYING.LESSER  - GNU Lesser General Public License v3
 Makefile        - makefile for this project (assumes gcc compiler and GNU make)
 README          - this file
+sample.cpp      - Program demonstrating how to use the bitfile class.
 
 BUILDING
 --------
@@ -33,6 +34,9 @@ HISTORY
 02/09/06 - Corrected bug in GetBit discovered by Peter Husemann.  A
            0xFF byte may be recognized as an EOF.
 06/03/06 - Corrected destructor for writing bitfile objects.
+08/26/07 - All methods that don't modify the calling object have been made
+           const to increase functionality of const bit_array_c.
+           Updated license to LGPL v3.
 
 TODO
 ----

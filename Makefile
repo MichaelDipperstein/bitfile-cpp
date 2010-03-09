@@ -1,8 +1,11 @@
 ############################################################################
-# Makefile for file class library and sample
+# Makefile for bitfile class library and sample
 #
-#   $Id: Makefile,v 1.2 2005/06/23 04:39:06 michael Exp $
+#   $Id: Makefile,v 1.3 2007/07/16 02:07:16 michael Exp $
 #   $Log: Makefile,v $
+#   Revision 1.3  2007/07/16 02:07:16  michael
+#   Use -pedantic option when compiling.
+#
 #   Revision 1.2  2005/06/23 04:39:06  michael
 #   Convert from DOS end of line to Unix end of line
 #
@@ -13,7 +16,7 @@
 
 CPP = g++
 LD = g++
-CPPFLAGS = -O2 -Wall -c
+CPPFLAGS = -O2 -Wall -pedantic -c
 LDFLAGS = -O2 -o
 
 # Treat NT and non-NT windows the same

@@ -15,8 +15,16 @@
 ****************************************************************************
 *   UPDATES
 *
-*   $Id: bitfile.h,v 1.3 2005/12/10 05:20:01 michael Exp $
+*   $Id: bitfile.h,v 1.5 2007/08/26 21:41:36 michael Exp $
 *   $Log: bitfile.h,v $
+*   Revision 1.5  2007/08/26 21:41:36  michael
+*   All methods that don't modify the calling object have been made const to increase functionality of const bit_array_c.
+*
+*   Changes required for LGPL v3.
+*
+*   Revision 1.4  2007/07/16 02:07:16  michael
+*   Use -pedantic option when compiling.
+*
 *   Revision 1.3  2005/12/10 05:20:01  michael
 *   Added methods to get/put bits from/to integer types.
 *
@@ -30,21 +38,22 @@
 ****************************************************************************
 *
 * Bitfile: Bit Stream File I/O Class
-* Copyright (C) 2004-2005 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
 *
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
+* This file is part of the bit file library.
 *
-* This library is distributed in the hope that it will be useful,
+* The bit file library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 3 of the
+* License, or (at your option) any later version.
+*
+* The bit file library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+* General Public License for more details.
 *
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+* You should have received a copy of the GNU Lesser General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
 
@@ -69,7 +78,7 @@ typedef enum
 {
     BF_UNKNOWN_ENDIAN,
     BF_LITTLE_ENDIAN,
-    BF_BIG_ENDIAN,
+    BF_BIG_ENDIAN
 } endian_t;
 
 class bit_file_c

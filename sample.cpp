@@ -9,8 +9,11 @@
 ****************************************************************************
 *   HISTORY
 *
-*   $Id: sample.cpp,v 1.4 2006/06/03 18:55:10 michael Exp $
+*   $Id: sample.cpp,v 1.5 2007/08/26 21:42:01 michael Exp $
 *   $Log: sample.cpp,v $
+*   Revision 1.5  2007/08/26 21:42:01  michael
+*   LGPL v3 License
+*
 *   Revision 1.4  2006/06/03 18:55:10  michael
 *   Used spell checker to correct errors in comments.
 *
@@ -28,21 +31,22 @@
 ****************************************************************************
 *
 * Sample: A bit file class sample usage program
-* Copyright (C) 2004 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
 *
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
+* This file is part of the bit file library.
 *
-* This library is distributed in the hope that it will be useful,
+* The bit file library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public License as
+* published by the Free Software Foundation; either version 3 of the
+* License, or (at your option) any later version.
+*
+* The bit file library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+* General Public License for more details.
 *
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+* You should have received a copy of the GNU Lesser General Public License
+* along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 ***************************************************************************/
 #include <iostream>
