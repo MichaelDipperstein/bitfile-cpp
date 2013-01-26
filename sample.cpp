@@ -71,13 +71,12 @@ using namespace std;
 *   Function   : main
 *   Description: This function demonstrates the usage of each of the bit
 *                bit file functions.
-*   Parameters : argc - the number command line arguments (not used)
-*   Parameters : argv - array of command line arguments (not used)
+*   Parameters : None
 *   Effects    : Writes bit file, reads back results, printing them to
 *                stdout.
 *   Returned   : EXIT_SUCCESS
 ***************************************************************************/
-int main(int argc, char *argv[])
+int main()
 {
     bit_file_c bf;
     int i, value;
