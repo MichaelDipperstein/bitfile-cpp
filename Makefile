@@ -1,23 +1,15 @@
 ############################################################################
 # Makefile for bitfile class library and sample
 #
-#   $Id: Makefile,v 1.3 2007/07/16 02:07:16 michael Exp $
-#   $Log: Makefile,v $
-#   Revision 1.3  2007/07/16 02:07:16  michael
-#   Use -pedantic option when compiling.
-#
-#   Revision 1.2  2005/06/23 04:39:06  michael
-#   Convert from DOS end of line to Unix end of line
-#
-#   Revision 1.1.1.1  2004/08/04 13:45:38  michael
-#   bitfile class
-#
 ############################################################################
 
 CPP = g++
 LD = g++
 CPPFLAGS = -O2 -Wall -Wextra -pedantic -c
 LDFLAGS = -O2 -o
+
+# libraries
+LIBS = -L. -lbitfile
 
 # Treat NT and non-NT windows the same
 ifeq ($(OS),Windows_NT)
@@ -34,16 +26,21 @@ endif
 
 all:		sample$(EXE)
 
-sample$(EXE):	sample.o bitfile.o
-		$(LD) $^ $(LDFLAGS) $@
+sample$(EXE):	sample.o libbitfile.a
+		$(LD) $< $(LIBS) $(LDFLAGS) $@
 
 sample.o:	sample.cpp bitfile.h
 		$(CPP) $(CPPFLAGS) $<
+
+libbitfile.a:	bitfile.o
+		ar crv libbitfile.a bitfile.o
+		ranlib libbitfile.a
 
 bitfile.o:	bitfile.cpp bitfile.h
 		$(CPP) $(CPPFLAGS) $<
 
 clean:
 		$(DEL) *.o
+		$(DEL) *.a
 		$(DEL) sample$(EXE)
 		$(DEL) testfile
