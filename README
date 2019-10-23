@@ -5,6 +5,9 @@ writing for sequential files.  This class is intended to be easy to follow
 and expand upon, though it may be used without an understanding of its
 implementation.
 
+More information on the bitfile library may be found at:
+https://michaeldipperstein.github.io/bitfile.html
+
 FILES
 -----
 bitfile.cpp     - Class implementing bitwise reading and writing for
@@ -50,4 +53,4 @@ TODO
 
 AUTHOR
 ------
-Michael Dipperstein (mdipper@alumni.engr.ucsb.edu)
+Michael Dipperstein (mdipperstein@gmail.com)

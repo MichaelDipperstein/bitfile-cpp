@@ -34,7 +34,7 @@
 ****************************************************************************
 *
 * Sample: A bit file class sample usage program
-* Copyright (C) 2004-2007 by Michael Dipperstein (mdipper@cs.ucsb.edu)
+* Copyright (C) 2004-2007 by Michael Dipperstein (mdipperstein@gmail.com)
 *
 * This file is part of the bit file library.
 *
